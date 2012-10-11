@@ -246,25 +246,33 @@ get_called(HV* options) {
     }
     else {
         IV frame;
-        SV* buffer;
+        const PERL_CONTEXT* cx, * dbcx;
         SV* caller;
 
         if ((temp = hv_fetch(options, "stack_skip", 10, 0))) {
             SvGETMAGIC(*temp);
-            frame = SvIV(*temp);
+            frame = SvIV(*temp) - 1;
+            if (frame < 0) frame = 0;
         }
-        else {
-            frame = 1;
+        else
+            frame = 0;
+
+        caller = sv_2mortal(newSVpvn("", 0));
+        cx = caller_cx(frame, &dbcx);
+        if (cx && CopSTASH(cx->blk_oldcop)) {
+            if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT) {
+                GV * const cvgv = CvGV(dbcx->blk_sub.cv);
+                if (cvgv && isGV(cvgv))
+                    gv_efullname3(caller, cvgv, NULL);
+                else
+                    sv_catpvn(caller, "(unknown)", 9);
+            }
+            else
+                sv_catpvn(caller, "(eval)", 6);
         }
-
-        buffer = sv_2mortal(newSVpvf("(caller(%d))[3]", (int) frame));
-        SvTAINTED_off(buffer);
-
-        caller = eval_pv(SvPV_nolen(buffer), 1);
-        if (SvTYPE(caller) == SVt_NULL) {
-            sv_setpv(caller, "N/A");
-        }
-
+        else
+            sv_catpvn(caller, "N/A", 3);
+        
         return caller;
     }
 }
