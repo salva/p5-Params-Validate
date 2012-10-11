@@ -93,50 +93,23 @@ INLINE static SV*
 typemask_to_string(IV mask) {
     SV* buffer;
     IV empty = 1;
-
+    STRLEN cur;
     buffer = sv_2mortal(newSVpv("", 0));
 
-    if (mask & SCALAR) {
-        sv_catpv(buffer, "scalar");
-        empty = 0;
+    if (mask & SCALAR   ) sv_catpv(buffer, "scalar "   );
+    if (mask & ARRAYREF ) sv_catpv(buffer, "arrayref " );
+    if (mask & HASHREF  ) sv_catpv(buffer, "hashref "  );
+    if (mask & CODEREF  ) sv_catpv(buffer, "coderef "  );
+    if (mask & GLOB     ) sv_catpv(buffer, "glob "     );
+    if (mask & GLOBREF  ) sv_catpv(buffer, "globref "  );
+    if (mask & SCALARREF) sv_catpv(buffer, "scalarref ");
+    if (mask & UNDEF    ) sv_catpv(buffer, "undef "    ); 
+    if (mask & OBJECT   ) sv_catpv(buffer, "object "   );
+    if (mask & UNKNOWN  ) sv_catpv(buffer, "unknown "  );
+    if (cur = SvCUR(buffer)) {
+        SvPVX(buffer)[cur - 1] = '\0';
+        SvCUR_set(buffer, cur - 1);
     }
-    if (mask & ARRAYREF) {
-        sv_catpv(buffer, empty ? "arrayref" : " arrayref");
-        empty = 0;
-    }
-    if (mask & HASHREF) {
-        sv_catpv(buffer, empty ? "hashref" : " hashref");
-        empty = 0;
-    }
-    if (mask & CODEREF) {
-        sv_catpv(buffer, empty ? "coderef" : " coderef");
-        empty = 0;
-    }
-    if (mask & GLOB) {
-        sv_catpv(buffer, empty ? "glob" : " glob");
-        empty = 0;
-    }
-    if (mask & GLOBREF) {
-        sv_catpv(buffer, empty ? "globref" : " globref");
-        empty = 0;
-    }
-    if (mask & SCALARREF) {
-        sv_catpv(buffer, empty ? "scalarref" : " scalarref");
-        empty = 0;
-    }
-    if (mask & UNDEF) {
-        sv_catpv(buffer, empty ? "undef" : " undef");
-        empty = 0;
-    }
-    if (mask & OBJECT) {
-        sv_catpv(buffer, empty ? "object" : " object");
-        empty = 0;
-    }
-    if (mask & UNKNOWN) {
-        sv_catpv(buffer, empty ? "unknown" : " unknown");
-        empty = 0;
-    }
-
     return buffer;
 }
 
