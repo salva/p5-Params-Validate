@@ -3,7 +3,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#define NEED_eval_pv
+/* #define NEED_eval_pv */
 #define NEED_newCONSTSUB
 #define NEED_sv_2pv_flags
 #include "ppport.h"
