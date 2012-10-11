@@ -92,8 +92,8 @@ no_validation() {
 INLINE static SV*
 typemask_to_string(IV mask) {
     SV* buffer;
-    IV empty = 1;
     STRLEN cur;
+
     buffer = sv_2mortal(newSVpv("", 0));
 
     if (mask & SCALAR   ) sv_catpv(buffer, "scalar "   );
@@ -106,7 +106,7 @@ typemask_to_string(IV mask) {
     if (mask & UNDEF    ) sv_catpv(buffer, "undef "    ); 
     if (mask & OBJECT   ) sv_catpv(buffer, "object "   );
     if (mask & UNKNOWN  ) sv_catpv(buffer, "unknown "  );
-    if (cur = SvCUR(buffer)) {
+    if ((cur = SvCUR(buffer))) {
         SvPVX(buffer)[cur - 1] = '\0';
         SvCUR_set(buffer, cur - 1);
     }
